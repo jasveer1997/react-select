@@ -15,12 +15,22 @@ export type CaptorProps = {
 class ScrollCaptor extends Component<CaptorProps> {
   isBottom: boolean = false;
   isTop: boolean = false;
+  isListened: boolean = false;
+  mouseStart: number;
   scrollTarget: HTMLElement;
   touchStart: number;
 
   componentDidMount() {
     this.startListening(this.scrollTarget);
   }
+  componentDidUpdate() {
+    if (!this.scrollTarget) return;
+
+    if (!this.isListened && (this.scrollTarget.scrollHeight > this.scrollTarget.clientHeight)) {
+      this.startListening(this.scrollTarget);
+    } else if (this.isListened && (this.scrollTarget.scrollHeight <= this.scrollTarget.clientHeight)) {
+      this.stopListening(this.scrollTarget);
+    }
   componentWillUnmount() {
     this.stopListening(this.scrollTarget);
   }
@@ -39,6 +49,13 @@ class ScrollCaptor extends Component<CaptorProps> {
     if (typeof el.addEventListener === 'function') {
       el.addEventListener('touchmove', this.onTouchMove, false);
     }
+    if (typeof el.addEventListener === 'function') {
+      el.addEventListener('mousedown', this.onMouseDown, false);
+    }
+    if (typeof el.addEventListener === 'function') {
+      el.addEventListener('mouseup', this.onMouseUp, false);
+    }
+    this.isListened = true;
   }
   stopListening(el: HTMLElement) {
     // bail early if no scroll available
@@ -54,6 +71,13 @@ class ScrollCaptor extends Component<CaptorProps> {
     if (typeof el.removeEventListener === 'function') {
       el.removeEventListener('touchmove', this.onTouchMove, false);
     }
+    if (typeof el.removeEventListener === 'function') {
+      el.removeEventListener('mousedown', this.onMouseDown, false);
+    }
+    if (typeof el.removeEventListener === 'function') {
+      el.removeEventListener('mouseup', this.onMouseUp, false);
+    }
+    this.isListened = false;
   }
 
   cancelScroll = (event: SyntheticEvent<HTMLElement>) => {
@@ -117,6 +141,14 @@ class ScrollCaptor extends Component<CaptorProps> {
   };
   onTouchMove = (event: SyntheticTouchEvent<HTMLElement>) => {
     const deltaY = this.touchStart - event.changedTouches[0].clientY;
+    this.handleEventDelta(event, deltaY);
+  };
+  onMouseDown = (event: SyntheticMouseEvent<HTMLElement>) => {
+    // set mouse start so we can calculate mousemove delta
+    this.mouseStart = event.clientY;
+  };
+  onMouseUp = (event: SyntheticMouseEvent<HTMLElement>) => {
+    const deltaY = event.clientY - this.mouseStart;
     this.handleEventDelta(event, deltaY);
   };
 
