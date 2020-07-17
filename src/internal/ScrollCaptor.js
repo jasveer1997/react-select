@@ -31,6 +31,8 @@ class ScrollCaptor extends Component<CaptorProps> {
     } else if (this.isListened && (this.scrollTarget.scrollHeight <= this.scrollTarget.clientHeight)) {
       this.stopListening(this.scrollTarget);
     }
+  }
+
   componentWillUnmount() {
     this.stopListening(this.scrollTarget);
   }
