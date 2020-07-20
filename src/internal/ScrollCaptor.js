@@ -147,6 +147,7 @@ class ScrollCaptor extends Component<CaptorProps> {
   };
   onMouseDown = (event: SyntheticMouseEvent<HTMLElement>) => {
     // set mouse start so we can calculate mousemove delta
+    this.handleEventDelta(event, 1);
     this.mouseStart = event.clientY;
   };
   onMouseUp = (event: SyntheticMouseEvent<HTMLElement>) => {
