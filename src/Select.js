@@ -1221,9 +1221,13 @@ export default class Select extends Component<Props, State> {
           this.openMenu('first');
           break;
         }
-        if (!focusedOption) return;
-        this.selectOption(focusedOption);
-        break;
+        /* Note:
+           Returning instead of breaking here. This is a diversion from original react-select code,
+           Also removed selecting filtered option on pressing space as is not generally as use case.
+           This bug only appears in case of nested Sws, where the outer SWS, calls event.preventDefault()
+           which prevents original event from bubbling up.
+         */
+        return;
       case 'ArrowUp':
         if (menuIsOpen) {
           this.focusOption('up');
